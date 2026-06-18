@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Revista Digital Interactiva - Estilo Issuu</title>
     <link rel="stylesheet" href="estilos.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
@@ -51,14 +51,8 @@
         </header>
 
         <main class="zona-lectura">
-            <!-- Botón de descarga para celulares como alternativa integrada -->
-            <div class="contenedor-movil">
-                <a href="Revista Triolgia universal XXI 2026.pdf" download class="boton-descargar">
-                    📄 Abrir / Descargar Revista PDF original
-                </a>
-            </div>
-
-            <div id="revista-interactiva" class="hidden"></div>
+            <div id="revista-interactiva" class="hidden">
+                </div>
             <div id="pantalla-vacia" class="mensaje-bienvenida">
                 <h2>Plataforma de Publicación Editorial</h2>
                 <p>Presiona "Nueva Revista" para cargar y publicar tu ejemplar digital en línea.</p>
@@ -70,3 +64,9 @@
     <script src="app.js"></script>
 </body>
 </html>
+<div class="contenedor-movil">
+    <p>¿No puedes ver la revista en tu pantalla?</p>
+    <a href="Revista Triolgia universal XXI 2026.pdf" download class="boton-descargar">
+        📄 Descargar o abrir Revista en PDF
+    </a>
+</div>
