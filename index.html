@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revista Digital Interactiva - Estilo Issuu</title>
+    <link rel="stylesheet" href="estilos.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.js"></script>
+</head>
+<body>
+
+    <div class="escenario-revista">
+        
+        <header class="menu-revista">
+            <div class="grupo-control">
+                <label class="lbl-publicar" id="btn-disparador-archivo">
+                    Nueva Revista
+                    <input type="file" id="cargar-pdf" accept="application/pdf" style="display: none;">
+                </label>
+                <span id="estado-publicacion" class="tag-estado">Sin Publicar</span>
+            </div>
+
+            <div class="grupo-control">
+                <button id="btn-inicio" class="btn-menu" title="Ir a la Portada (Apertura)" disabled>⏮</button>
+                <button id="btn-anterior" class="btn-menu" title="Página Anterior" disabled>◀ Anter.</button>
+                <span id="control-paginas">Cargue una revista...</span>
+                <button id="btn-siguiente" class="btn-menu" title="Página Siguiente" disabled>Siguiente ▶</button>
+                <button id="btn-final" class="btn-menu" title="Ir a la Contraportada (Cierre)" disabled>⏭</button>
+            </div>
+
+            <div class="grupo-control">
+                <select id="selector-zoom" class="select-menu" disabled>
+                    <option value="100">Vista Normal (100%)</option>
+                    <option value="130">Lectura Cómoda (130%)</option>
+                    <option value="160">Zoom Máximo (160%)</option>
+                </select>
+
+                <div class="contenedor-compartir">
+                    <button id="btn-compartir" class="btn-menu btn-oro" disabled>Compartir 🔗</button>
+                    <div id="menu-redes" class="redes-desplegable hidden">
+                        <a href="#" id="share-fb" target="_blank">Facebook</a>
+                        <a href="#" id="share-wa" target="_blank">WhatsApp</a>
+                        <a href="#" id="share-tx" target="_blank">Twitter / X</a>
+                        <a href="#" id="share-tg" target="_blank">Telegram</a>
+                        <hr class="divisor-menu">
+                        <button id="share-copy">Copiar Enlace</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="zona-lectura">
+            <div id="revista-interactiva" class="hidden">
+                </div>
+            <div id="pantalla-vacia" class="mensaje-bienvenida">
+                <h2>Plataforma de Publicación Editorial</h2>
+                <p>Presiona "Nueva Revista" para cargar y publicar tu ejemplar digital en línea.</p>
+            </div>
+        </main>
+
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

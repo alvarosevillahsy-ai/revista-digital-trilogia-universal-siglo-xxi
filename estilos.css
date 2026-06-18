@@ -1,0 +1,191 @@
+/* Configuración de Entorno Editorial Premium */
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #1a1a1a; 
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    overflow: hidden;
+}
+
+.escenario-revista {
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+    height: 100vh;
+}
+
+/* Barra Superior Corporativa */
+.menu-revista {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #0d0d0d;
+    padding: 10px 20px;
+    border-bottom: 1px solid #2d2d2d;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+    z-index: 100;
+    height: 60px;
+    box-sizing: border-box;
+}
+
+.grupo-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #ffffff;
+    font-size: 13px;
+}
+
+/* Estilización de Botones */
+.btn-menu, .select-menu {
+    background-color: #262626;
+    color: #ffffff;
+    border: 1px solid #404040;
+    padding: 7px 12px;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.btn-menu:hover:not(:disabled), .select-menu:hover:not(:disabled) {
+    background-color: #333333;
+    border-color: #d4af37;
+}
+
+.btn-menu:disabled, .select-menu:disabled {
+    background-color: #141414;
+    color: #555555;
+    border-color: #222222;
+    cursor: not-allowed;
+}
+
+/* Toque Dorado Premium */
+.lbl-publicar, .btn-oro {
+    background-color: #d4af37;
+    color: #000000;
+    padding: 7px 14px;
+    border-radius: 4px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 13px;
+    display: inline-block;
+    transition: background 0.2s;
+}
+
+.lbl-publicar:hover, .btn-oro:hover:not(:disabled) {
+    background-color: #f1c40f;
+}
+
+/* Etiquetas de Estado de Publicación */
+.tag-estado {
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: bold;
+    background-color: #c0392b;
+    color: #ffffff;
+}
+.tag-estado.publicado {
+    background-color: #27ae60;
+}
+
+#control-paginas {
+    color: #d4af37;
+    font-weight: 600;
+    min-width: 140px;
+    text-align: center;
+}
+
+/* Zona de Lectura y Despliegue */
+.zona-lectura {
+    flex: 1;
+    width: 100%;
+    height: calc(100vh - 60px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: auto;
+    padding: 20px;
+    box-sizing: border-box;
+    position: relative;
+}
+
+#revista-interactiva {
+    background-color: transparent !important;
+    display: block;
+    transform-origin: center center;
+    transition: transform 0.2s ease-out;
+}
+
+/* Ventana Emergente de Compartir Redes */
+.contenedor-compartir {
+    position: relative;
+    display: inline-block;
+}
+
+.redes-desplegable {
+    position: absolute;
+    right: 0;
+    top: 38px;
+    background-color: #111111;
+    border: 1px solid #333333;
+    border-radius: 6px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.7);
+    width: 160px;
+    display: flex;
+    flex-direction: column;
+    padding: 6px 0;
+    z-index: 200;
+}
+
+.redes-desplegable a, .redes-desplegable button {
+    color: #cccccc;
+    padding: 8px 16px;
+    text-decoration: none;
+    font-size: 13px;
+    text-align: left;
+    background: none;
+    border: none;
+    width: 100%;
+    cursor: pointer;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.redes-desplegable a:hover, .redes-desplegable button:hover {
+    background-color: #222222;
+    color: #d4af37;
+}
+
+.divisor-menu {
+    border: 0;
+    border-top: 1px solid #333333;
+    margin: 4px 0;
+}
+
+.mensaje-bienvenida {
+    color: #888888;
+    text-align: center;
+}
+.mensaje-bienvenida h2 { color: #d4af37; margin-bottom: 5px; }
+
+.hidden { display: none !important; }
+
+/* Páginas Interiores */
+.pagina-renderizada {
+    background-color: #ffffff;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+canvas {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+}
