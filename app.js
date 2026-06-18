@@ -5,7 +5,7 @@ let db = null;
 const NOMBRE_DB = "PlataformaEditorialDB";
 const STORE_DB = "RevistasStore";
 
-// 1. INICIALIZAR BASE DE DATOS LOCAL AL CARGAR LA PÁGINA
+// 1. INICIALIZAR BASE DE DATOS LOCAL
 const requestDB = indexedDB.open(NOMBRE_DB, 1);
 
 requestDB.onupgradeneeded = function(e) {
@@ -17,14 +17,14 @@ requestDB.onupgradeneeded = function(e) {
 
 requestDB.onsuccess = function(e) {
     db = e.target.result;
-    verificarYLimpiarRevistaPublicada(); // Buscar si hay una revista en línea previamente guardada
+    verificarYLimpiarRevistaPublicada(); 
 };
 
 requestDB.onerror = function() {
     console.error("Error al conectar con la base de datos local.");
 };
 
-// Escuchador para cargar un nuevo archivo PDF
+// Escuchador para cargar un nuevo archivo PDF manualmente
 document.getElementById('cargar-pdf').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (file && file.type === "application/pdf") {
@@ -37,7 +37,6 @@ document.getElementById('cargar-pdf').addEventListener('change', function(e) {
     }
 });
 
-// Guardar el PDF de forma permanente en la base de datos del navegador
 function publicarRevistaEnLinea(bufferArray) {
     const transaccion = db.transaction([STORE_DB], "readwrite");
     const almacén = transaccion.objectStore(STORE_DB);
@@ -55,7 +54,7 @@ function publicarRevistaEnLinea(bufferArray) {
     };
 }
 
-// Verificar si ya existe un documento publicado en el sistema
+// CORRECCIÓN DE SEGURIDAD INTERNA PARA EL NAVEGADOR
 function verificarYLimpiarRevistaPublicada() {
     const transaccion = db.transaction([STORE_DB], "readonly");
     const almacén = transaccion.objectStore(STORE_DB);
@@ -63,13 +62,33 @@ function verificarYLimpiarRevistaPublicada() {
 
     solicitudLeer.onsuccess = function(e) {
         if (solicitudLeer.result) {
-            // Existe una revista publicada, se renderiza de inmediato en línea
             procesarYRenderizarPDF(solicitudLeer.result.datos, true);
+        } else {
+            console.log("Descargando ejemplar oficial de forma segura...");
+            const urlPdfOficial = "Revista Triolgia universal XXI 2026.pdf"; 
+            
+            // Usamos un Fetch seguro para saltar los bloqueos del navegador
+            fetch(urlPdfOficial)
+                .then(response => {
+                    if (!response.ok) throw new Error("No se pudo encontrar el archivo PDF en el servidor.");
+                    return response.arrayBuffer();
+                })
+                .then(buffer => {
+                    const typedarray = new Uint8Array(buffer);
+                    procesarYRenderizarPDF(typedarray, true);
+                })
+                .catch(error => {
+                    console.error("Error en la descarga automática segura:", error);
+                });
         }
+    };
+    
+    solicitudLeer.onerror = function() {
+        console.error("Error leyendo IndexedDB, usando canal alterno.");
     };
 }
 
-// 2. MOTOR GRÁFICO DE LA REVISTA (Optimizado para Computadora y Celular)
+// 2. MOTOR GRÁFICO DE LA REVISTA
 async function procesarYRenderizarPDF(data, esPublicado) {
     const elRevista = document.getElementById('revista-interactiva');
     const pantallaVacia = document.getElementById('pantalla-vacia');
@@ -86,14 +105,13 @@ async function procesarYRenderizarPDF(data, esPublicado) {
     }
 
     try {
-        const pdf = await pdfjsLib.getDocument(data).promise;
+        const pdf = await pdfjsLib.getDocument({ data: data }).promise; // Carga segura como binario puro
         const totalPaginas = pdf.numPages;
 
         const zonaLectura = document.querySelector('.zona-lectura');
         const anchoDisponibleMax = zonaLectura.clientWidth - 20;
         const altoDisponibleMax = zonaLectura.clientHeight - 20;
 
-        // DETECTAR SI ES CELULAR
         const esMovil = window.innerWidth <= 768;
 
         const primeraPagina = await pdf.getPage(1);
@@ -104,23 +122,17 @@ async function procesarYRenderizarPDF(data, esPublicado) {
         let altoPaginaPx;
 
         if (esMovil) {
-            // Modo Celular: Ocupar el ancho disponible con una sola página completa
             escalaOptima = anchoDisponibleMax / viewportOriginal.width;
             anchoPaginaPx = Math.floor(viewportOriginal.width * escalaOptima);
             altoPaginaPx = Math.floor(viewportOriginal.height * escalaOptima);
-            
-            // Contenedor rígido de UNA sola página para pantallas móviles
             elRevista.style.width = `${anchoPaginaPx}px`;
         } else {
-            // Modo Computadora: Vista clásica de doble página abierta
             const escalaAncho = (anchoDisponibleMax / 2) / viewportOriginal.width;
             const escalaAlto = altoDisponibleMax / viewportOriginal.height;
             escalaOptima = Math.min(escalaAncho, escalaAlto);
             
             anchoPaginaPx = Math.floor(viewportOriginal.width * escalaOptima);
             altoPaginaPx = Math.floor(viewportOriginal.height * escalaOptima);
-            
-            // Contenedor rígido de DOS páginas juntas
             elRevista.style.width = `${anchoPaginaPx * 2}px`;
         }
 
@@ -147,14 +159,14 @@ async function procesarYRenderizarPDF(data, esPublicado) {
         }
 
         const opcionesFlipbook = {
-            width: anchoPaginaPx,
+            width: esMovil ? anchoPaginaPx : anchoPaginaPx * 2,
             height: altoPaginaPx,
-            size: "fixed",
-            disabledSpineRendering: esMovil, // Quita el lomo del libro si es celular
+            size: esMovil ? "fixed" : "stretch", 
+            disabledSpineRendering: esMovil, 
             drawShadow: true, 
-            showCover: !esMovil, // Desactiva comportamiento complejo de portada en celular
+            showCover: !esMovil, 
             fixedOnCanvas: true, 
-            usePortrait: esMovil, // Forzar vista vertical (Retrato) si es celular
+            usePortrait: esMovil, 
             flippingTime: 700 
         };
 
@@ -173,88 +185,8 @@ async function procesarYRenderizarPDF(data, esPublicado) {
         console.error("Error al procesar la revista: ", error);
     }
 }
-    
-    elRevista.innerHTML = ''; 
-    pantallaVacia.classList.add('hidden');
-    elRevista.classList.remove('hidden');
-    elRevista.style.transform = "scale(1)"; 
 
-    if(esPublicado) {
-        tagEstado.innerText = "Publicado en Línea";
-        tagEstado.classList.add('publicado');
-    }
-
-    try {
-        const pdf = await pdfjsLib.getDocument(data).promise;
-        const totalPaginas = pdf.numPages;
-
-        const zonaLectura = document.querySelector('.zona-lectura');
-        const anchoDisponibleMax = zonaLectura.clientWidth - 40;
-        const altoDisponibleMax = zonaLectura.clientHeight - 40;
-
-        const primeraPagina = await pdf.getPage(1);
-        const viewportOriginal = primeraPagina.getViewport({ scale: 1.0 });
-
-        const escalaAncho = (anchoDisponibleMax / 2) / viewportOriginal.width;
-        const escalaAlto = altoDisponibleMax / viewportOriginal.height;
-        const escalaOptima = Math.min(escalaAncho, escalaAlto);
-
-        const anchoPaginaPx = Math.floor(viewportOriginal.width * escalaOptima);
-        const altoPaginaPx = Math.floor(viewportOriginal.height * escalaOptima);
-
-        // Contenedor rígido doble permanente para evitar desvíos o brincos
-        elRevista.style.width = `${anchoPaginaPx * 2}px`;
-        elRevista.style.height = `${altoPaginaPx}px`;
-
-        for (let num = 1; num <= totalPaginas; num++) {
-            const pagina = await pdf.getPage(num);
-            const viewport = pagina.getViewport({ scale: escalaOptima });
-
-            const divPagina = document.createElement('div');
-            divPagina.className = 'pagina-renderizada';
-            divPagina.style.width = `${anchoPaginaPx}px`;
-            divPagina.style.height = `${altoPaginaPx}px`;
-            
-            const canvas = document.createElement('canvas');
-            const contexto = canvas.getContext('2d');
-            canvas.height = altoPaginaPx;
-            canvas.width = anchoPaginaPx;
-
-            divPagina.appendChild(canvas);
-            elRevista.appendChild(divPagina);
-
-            await pagina.render({ canvasContext: contexto, viewport: viewport }).promise;
-        }
-
-        const opcionesFlipbook = {
-            width: anchoPaginaPx,
-            height: altoPaginaPx,
-            size: "fixed",
-            disabledSpineRendering: false, 
-            drawShadow: true, 
-            showCover: true, 
-            fixedOnCanvas: true, // Portada centrada estática interna
-            usePortrait: false, 
-            flippingTime: 700 
-        };
-
-        if (flipBook) { flipBook.destroy(); } // Destruir instancia previa si se cambia la revista
-
-        if (typeof pageFlip !== 'undefined' && pageFlip.PageFlip) {
-            flipBook = new pageFlip.PageFlip(elRevista, opcionesFlipbook);
-        } else if (typeof St !== 'undefined' && St.PageFlip) {
-            flipBook = new St.PageFlip(elRevista, opcionesFlipbook);
-        }
-
-        flipBook.loadFromHTML(document.querySelectorAll('.pagina-renderizada'));
-        configurarControlesInterfaz(totalPaginas);
-
-    } catch (error) {
-        console.error("Error al procesar la revista: ", error);
-    }
-}
-
-// 3. LOGÍSITICA DE BOTONES AVANZADOS Y COMPARTIR EN REDES
+// 3. LOGÍSTICA DE INTERFAZ Y CONTROLES
 function configurarControlesInterfaz(totalPaginas) {
     const btnInicio = document.getElementById('btn-inicio');
     const btnAnterior = document.getElementById('btn-anterior');
@@ -267,7 +199,6 @@ function configurarControlesInterfaz(totalPaginas) {
     const elRevista = document.getElementById('revista-interactiva');
     const zonaLectura = document.querySelector('.zona-lectura');
 
-    // Activar todos los controles operativos
     btnInicio.disabled = false;
     btnAnterior.disabled = false;
     btnSiguiente.disabled = false;
@@ -291,15 +222,11 @@ function configurarControlesInterfaz(totalPaginas) {
         }
     });
 
-    // Operaciones de Navegación Estándar
     btnAnterior.onclick = () => { flipBook.flipPrev(); };
     btnSiguiente.onclick = () => { flipBook.flipNext(); };
+    btnInicio.onclick = () => { flipBook.turnToPage(0); }; 
+    btnFinal.onclick = () => { flipBook.turnToPage(totalPaginas - 1); }; 
 
-    // NUEVO: Funciones de Salto Directo Solicitadas
-    btnInicio.onclick = () => { flipBook.turnToPage(0); }; // Salto directo a Portada (Apertura)
-    btnFinal.onclick = () => { flipBook.turnToPage(totalPaginas - 1); }; // Salto directo a Contraportada (Cierre)
-
-    // Lógica del Zoom
     selectorZoom.onchange = (e) => {
         const porcentaje = parseInt(e.target.value);
         const escala = porcentaje / 100;
@@ -307,15 +234,13 @@ function configurarControlesInterfaz(totalPaginas) {
         zonaLectura.style.alignItems = porcentaje > 100 ? 'flex-start' : 'center';
     };
 
-    // NUEVO: Menú Desplegable Compartir Redes Sociales
     btnCompartir.onclick = (e) => {
         e.stopPropagation();
         menuRedes.classList.toggle('hidden');
     };
 
-    document.onclick = () => { menuRedes.classList.add('hidden'); }; // Cerrar menú al hacer clic fuera
+    document.onclick = () => { menuRedes.classList.add('hidden'); }; 
 
-    // Configuración de Enlaces de Redes Sociales Dinámicas
     const urlCompartir = encodeURIComponent(window.location.href);
     const mensajeCompartir = encodeURIComponent("¡Te invito a leer nuestra última edición de la revista digital interactiva!");
 
